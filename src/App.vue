@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import Mapper from "./components/Mapper.vue";
+import Mapper from './components/Mapper.vue'
 </script>
 
 <template>
