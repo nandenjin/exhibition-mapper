@@ -4,9 +4,17 @@
   "scripts": {
     "dev": "vite",
     "build": "vue-tsc --noEmit && vite build",
-    "serve": "vite preview"
+    "serve": "vite preview",
+    "lint": "eslint --ext ts,js .",
+    "lintfix": "eslint --fix --ext ts,js .",
+    "format": "prettier --write \"*.{ts,js,json,vue,md,yml,yaml}\""
   },
   "dependencies": {
+    "@typescript-eslint/eslint-plugin": "^4.32.0",
+    "@typescript-eslint/parser": "^4.32.0",
+    "eslint": "^7.32.0",
+    "eslint-config-prettier": "^8.3.0",
+    "prettier": "^2.4.1",
     "sass": "^1.42.1",
     "vue": "^3.2.16"
   },
