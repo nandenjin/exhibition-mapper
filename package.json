@@ -16,9 +16,11 @@
     "eslint-config-prettier": "^8.3.0",
     "prettier": "^2.4.1",
     "sass": "^1.42.1",
+    "three": "^0.132.2",
     "vue": "^3.2.16"
   },
   "devDependencies": {
+    "@types/three": "^0.132.1",
     "@vitejs/plugin-vue": "^1.9.2",
     "typescript": "^4.4.3",
     "vite": "^2.6.0",
