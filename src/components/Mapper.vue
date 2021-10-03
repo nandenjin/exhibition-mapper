@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { WebGLRenderer, Scene, OrthographicCamera, Vector2 } from 'three'
-import { onMounted, ref } from 'vue'
+import { WebGLRenderer, Scene, OrthographicCamera, Vector2, BoxBufferGeometry, Mesh, MeshBasicMaterial, BufferGeometry, BufferAttribute } from 'three'
+import { onMounted, ref, watch } from 'vue'
 import { Pin } from '../types'
 
 const rootRef = ref<HTMLDivElement>()
@@ -33,10 +33,33 @@ const camera = new OrthographicCamera(
   props.width / 2,
   props.height / 2,
   -props.height / 2,
-  1,
+  0.01,
   1000
 )
+camera.position.set(0,0,100)
 camera.updateProjectionMatrix()
+camera.lookAt(0,0,0)
+
+const geometry = new BufferGeometry()
+
+const position = new BufferAttribute(new Float32Array([0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]),3)
+geometry.setAttribute('position', position)
+
+const material = new MeshBasicMaterial({color: 0x00bbff})
+const mesh = new Mesh(geometry,material)
+mesh.scale.setY(-1)
+
+scene.add(mesh)
+
+const positionIndexes = new Int8Array([0,2,1,1,2,3])
+const updateVertices = () => {
+  for (let i = 0; i < positionIndexes.length; i++) {
+    position.setXYZ(i,...props.pins[positionIndexes[i]].position.toArray(), 0)
+  }
+  position.needsUpdate = true
+}
+updateVertices()
+watch([props.pins], updateVertices)
 
 let focusingPinId: string | null = null
 

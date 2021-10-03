@@ -9,19 +9,19 @@ const state = reactive<{
 }>({
   pins: [
     {
-      id: '0',
-      position: new Vector2(100, -100),
-    },
-    {
-      id: '1',
+      id: 'TL',
       position: new Vector2(-100, -100),
     },
     {
-      id: '2',
+      id: 'TR',
       position: new Vector2(-100, 100),
     },
     {
-      id: '3',
+      id: 'BL',
+      position: new Vector2(100, -100),
+    },
+    {
+      id: 'BR',
       position: new Vector2(100, 100),
     },
   ],
