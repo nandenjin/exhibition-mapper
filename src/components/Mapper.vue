@@ -62,6 +62,7 @@ updateVertices()
 watch([props.pins], updateVertices)
 
 let focusingPinId: string | null = null
+const dragging = ref<boolean>(false)
 
 const emit = defineEmits<{
   (event: 'pinPositionUpdate', pin: Pin): void
@@ -85,10 +86,12 @@ const onMouseMove = (e: MouseEvent): void => {
 
 const onMouseUp = (): void => {
   focusingPinId = null
+  dragging.value = false
 }
 
 const onMouseDown = (_: MouseEvent, id: string): void => {
   focusingPinId = id
+  dragging.value =true
 }
 </script>
 
@@ -115,7 +118,7 @@ const onMouseDown = (_: MouseEvent, id: string): void => {
         }"
         @mousedown="(e) => onMouseDown(e, pin.id)"
       >
-        {{ pin.position.x }},{{ pin.position.y }}
+        <span v-if="!dragging" class="mapper__pin__label">{{ pin.position.x }},{{ pin.position.y }}</span>
       </div>
     </div>
   </div>
@@ -141,6 +144,20 @@ const onMouseDown = (_: MouseEvent, id: string): void => {
     position: absolute;
     cursor: pointer;
     user-select: none;
+
+    &::before {
+      content: '';
+      display: inline-block;
+      width: 15px;
+      height: 15px;
+      border: 1px solid #fff;
+      transform: translate3d(-50%, -50%, 0);
+      background-color: rgba(255,0,255,0.5);
+    }
+
+    &__label {
+      transform: translate3d(10px,10px,0);
+    }
   }
 }
 </style>
