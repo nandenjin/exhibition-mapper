@@ -4,18 +4,22 @@ import {
   Scene,
   OrthographicCamera,
   Vector2,
-  BoxBufferGeometry,
   Mesh,
   MeshBasicMaterial,
   BufferGeometry,
   BufferAttribute,
 } from 'three'
-import { onMounted, ref, watch } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
+import { useStore } from 'vuex'
+import { key } from '../store'
 import { Pin } from '../types'
 
 const emit = defineEmits<{
   (event: 'pinPositionUpdate', pin: Pin): void
 }>()
+
+const store = useStore(key)
+const setupMode = computed(() => store.state.setupMode)
 
 const rootRef = ref<HTMLDivElement>()
 const canvasRef = ref<HTMLCanvasElement>()
@@ -133,6 +137,7 @@ watch([() => props.width, () => props.height], () => {
     <div
       class="mapper__pin-container"
       ref="containerRef"
+      v-if="setupMode"
       :style="{ width: `${props.width}px`, height: `${props.height}px` }"
       @mousemove="onMouseMove"
       @mouseup="onMouseUp"

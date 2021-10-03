@@ -1,8 +1,12 @@
 <script setup lang="ts">
 import { Vector2 } from 'three'
 import { onMounted, onUnmounted, reactive } from 'vue'
+import { useStore } from 'vuex'
 import Mapper from './components/Mapper.vue'
+import { key } from './store'
 import { Pin } from './types'
+
+const store = useStore(key)
 
 const state = reactive<{
   pins: Pin[]
@@ -39,6 +43,7 @@ const updatePin = (updated: Pin) => {
   }
 }
 
+// Resize
 const updateSize = () => {
   state.width = window.innerWidth
   state.height = window.innerHeight
@@ -52,6 +57,20 @@ onMounted(() => {
 onUnmounted(() => {
   window.removeEventListener('resize', updateSize)
 })
+
+// Setup Mode
+const handleSetupTrigger = (e: KeyboardEvent) => {
+  if (e.key === 's') {
+    store.commit('setSetupMode', !store.state.setupMode)
+  }
+}
+
+onMounted(() => {
+  window.addEventListener('keydown', handleSetupTrigger)
+})
+onUnmounted(() => {
+  window.removeEventListener('keydown', handleSetupTrigger)
+})
 </script>
 
 <template>
@@ -61,6 +80,13 @@ onUnmounted(() => {
     :pins="state.pins"
     @pin-position-update="updatePin"
   />
+  <video
+    class="video"
+    v-show="store.state.setupMode"
+    controls
+    autoplay
+    loop
+  ></video>
 </template>
 
 <style lang="scss">
