@@ -1,11 +1,13 @@
 <script setup lang="ts">
 import { Vector2 } from 'three'
-import { reactive } from 'vue'
+import { onMounted, onUnmounted, reactive } from 'vue'
 import Mapper from './components/Mapper.vue'
 import { Pin } from './types'
 
 const state = reactive<{
   pins: Pin[]
+  width: number
+  height: number
 }>({
   pins: [
     {
@@ -25,6 +27,8 @@ const state = reactive<{
       position: new Vector2(100, 100),
     },
   ],
+  width: 0,
+  height: 0,
 })
 
 const updatePin = (updated: Pin) => {
@@ -34,12 +38,26 @@ const updatePin = (updated: Pin) => {
     }
   }
 }
+
+const updateSize = () => {
+  state.width = window.innerWidth
+  state.height = window.innerHeight
+}
+
+updateSize()
+
+onMounted(() => {
+  window.addEventListener('resize', updateSize)
+})
+onUnmounted(() => {
+  window.removeEventListener('resize', updateSize)
+})
 </script>
 
 <template>
   <Mapper
-    :width="960"
-    :height="600"
+    :width="state.width"
+    :height="state.height"
     :pins="state.pins"
     @pin-position-update="updatePin"
   />

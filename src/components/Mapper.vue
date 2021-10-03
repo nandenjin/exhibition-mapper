@@ -1,7 +1,21 @@
 <script setup lang="ts">
-import { WebGLRenderer, Scene, OrthographicCamera, Vector2, BoxBufferGeometry, Mesh, MeshBasicMaterial, BufferGeometry, BufferAttribute } from 'three'
+import {
+  WebGLRenderer,
+  Scene,
+  OrthographicCamera,
+  Vector2,
+  BoxBufferGeometry,
+  Mesh,
+  MeshBasicMaterial,
+  BufferGeometry,
+  BufferAttribute,
+} from 'three'
 import { onMounted, ref, watch } from 'vue'
 import { Pin } from '../types'
+
+const emit = defineEmits<{
+  (event: 'pinPositionUpdate', pin: Pin): void
+}>()
 
 const rootRef = ref<HTMLDivElement>()
 const canvasRef = ref<HTMLCanvasElement>()
@@ -11,8 +25,10 @@ const props = defineProps<{
   pins: Pin[]
 }>()
 
+let renderer: WebGLRenderer
+
 onMounted(() => {
-  const renderer = new WebGLRenderer({
+  renderer = new WebGLRenderer({
     antialias: true,
     canvas: canvasRef.value,
   })
@@ -36,37 +52,37 @@ const camera = new OrthographicCamera(
   0.01,
   1000
 )
-camera.position.set(0,0,100)
+camera.position.set(0, 0, 100)
 camera.updateProjectionMatrix()
-camera.lookAt(0,0,0)
+camera.lookAt(0, 0, 0)
 
 const geometry = new BufferGeometry()
 
-const position = new BufferAttribute(new Float32Array([0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]),3)
+const position = new BufferAttribute(
+  new Float32Array([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]),
+  3
+)
 geometry.setAttribute('position', position)
 
-const material = new MeshBasicMaterial({color: 0x00bbff})
-const mesh = new Mesh(geometry,material)
+const material = new MeshBasicMaterial({ color: 0x00bbff })
+const mesh = new Mesh(geometry, material)
 mesh.scale.setY(-1)
 
 scene.add(mesh)
 
-const positionIndexes = new Int8Array([0,2,1,1,2,3])
+const positionIndexes = new Int8Array([0, 2, 1, 1, 2, 3])
 const updateVertices = () => {
   for (let i = 0; i < positionIndexes.length; i++) {
-    position.setXYZ(i,...props.pins[positionIndexes[i]].position.toArray(), 0)
+    position.setXYZ(i, ...props.pins[positionIndexes[i]].position.toArray(), 0)
   }
   position.needsUpdate = true
 }
 updateVertices()
 watch([props.pins], updateVertices)
 
+// Drag UI
 let focusingPinId: string | null = null
 const dragging = ref<boolean>(false)
-
-const emit = defineEmits<{
-  (event: 'pinPositionUpdate', pin: Pin): void
-}>()
 
 const onMouseMove = (e: MouseEvent): void => {
   if (focusingPinId === null || !rootRef.value) return
@@ -91,8 +107,21 @@ const onMouseUp = (): void => {
 
 const onMouseDown = (_: MouseEvent, id: string): void => {
   focusingPinId = id
-  dragging.value =true
+  dragging.value = true
 }
+
+// Size
+watch([() => props.width, () => props.height], () => {
+  camera.left = -props.width / 2
+  camera.right = props.width / 2
+  camera.top = props.height / 2
+  camera.bottom = -props.height / 2
+  camera.updateProjectionMatrix()
+
+  if (renderer) {
+    renderer.setSize(props.width, props.height)
+  }
+})
 </script>
 
 <template>
@@ -118,7 +147,9 @@ const onMouseDown = (_: MouseEvent, id: string): void => {
         }"
         @mousedown="(e) => onMouseDown(e, pin.id)"
       >
-        <span v-if="!dragging" class="mapper__pin__label">{{ pin.position.x }},{{ pin.position.y }}</span>
+        <span v-if="!dragging" class="mapper__pin__label"
+          >{{ pin.position.x }},{{ pin.position.y }}</span
+        >
       </div>
     </div>
   </div>
@@ -152,11 +183,11 @@ const onMouseDown = (_: MouseEvent, id: string): void => {
       height: 15px;
       border: 1px solid #fff;
       transform: translate3d(-50%, -50%, 0);
-      background-color: rgba(255,0,255,0.5);
+      background-color: rgba(255, 0, 255, 0.5);
     }
 
     &__label {
-      transform: translate3d(10px,10px,0);
+      transform: translate3d(10px, 10px, 0);
     }
   }
 }
