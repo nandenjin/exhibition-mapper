@@ -8,18 +8,21 @@ import {
   MeshBasicMaterial,
   BufferGeometry,
   BufferAttribute,
+  VideoTexture,
 } from 'three'
-import { computed, onMounted, ref, watch } from 'vue'
+import { onMounted, ref, watch } from 'vue'
 import { useStore } from 'vuex'
 import { key } from '../store'
 import { Pin } from '../types'
 
 const emit = defineEmits<{
-  (event: 'pinPositionUpdate', pin: Pin): void
+  (
+    event: 'pinPositionUpdate',
+    pin: { id: Pin['id']; position: Pin['position'] }
+  ): void
 }>()
 
 const store = useStore(key)
-const setupMode = computed(() => store.state.setupMode)
 
 const rootRef = ref<HTMLDivElement>()
 const canvasRef = ref<HTMLCanvasElement>()
@@ -27,6 +30,7 @@ const props = defineProps<{
   width: number
   height: number
   pins: Pin[]
+  video?: HTMLVideoElement
 }>()
 
 let renderer: WebGLRenderer
@@ -66,23 +70,53 @@ const position = new BufferAttribute(
   new Float32Array([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]),
   3
 )
+const uv = new BufferAttribute(
+  new Float32Array([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]),
+  2
+)
 geometry.setAttribute('position', position)
+geometry.setAttribute('uv', uv)
 
-const material = new MeshBasicMaterial({ color: 0x00bbff })
-const mesh = new Mesh(geometry, material)
+const mapMaterial = new MeshBasicMaterial({ color: 0x00bbff })
+const videoMaterial = new MeshBasicMaterial({ color: 0xffffff })
+const mesh = new Mesh(geometry, videoMaterial)
 mesh.scale.setY(-1)
 
 scene.add(mesh)
 
-const positionIndexes = new Int8Array([0, 2, 1, 1, 2, 3])
+const pinIndexes = new Int8Array([0, 2, 1, 1, 2, 3])
 const updateVertices = () => {
-  for (let i = 0; i < positionIndexes.length; i++) {
-    position.setXYZ(i, ...props.pins[positionIndexes[i]].position.toArray(), 0)
+  for (let i = 0; i < pinIndexes.length; i++) {
+    position.setXYZ(i, ...props.pins[pinIndexes[i]].position.toArray(), 0)
+    uv.setXY(i, ...props.pins[pinIndexes[i]].uv.toArray())
   }
   position.needsUpdate = true
 }
 updateVertices()
 watch([props.pins], updateVertices)
+
+watch([() => props.video], () => {
+  if (props.video) {
+    const videoTexture = new VideoTexture(props.video)
+    videoTexture.needsUpdate = true
+
+    // VideoMaterial
+    videoMaterial.map = videoTexture
+    videoMaterial.needsUpdate = true
+
+    // mapMaterial
+    mapMaterial.map = videoTexture
+    mapMaterial.needsUpdate = true
+  }
+})
+
+watch([() => store.state.mode], () => {
+  if (store.state.mode === 'map') {
+    mesh.material = mapMaterial
+  } else {
+    mesh.material = videoMaterial
+  }
+})
 
 // Drag UI
 let focusingPinId: string | null = null
@@ -137,7 +171,7 @@ watch([() => props.width, () => props.height], () => {
     <div
       class="mapper__pin-container"
       ref="containerRef"
-      v-if="setupMode"
+      v-if="store.state.mode === 'map'"
       :style="{ width: `${props.width}px`, height: `${props.height}px` }"
       @mousemove="onMouseMove"
       @mouseup="onMouseUp"

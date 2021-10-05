@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Vector2 } from 'three'
-import { onMounted, onUnmounted, reactive } from 'vue'
+import { onMounted, onUnmounted, reactive, ref } from 'vue'
 import { useStore } from 'vuex'
 import Mapper from './components/Mapper.vue'
 import { key } from './store'
@@ -17,25 +17,29 @@ const state = reactive<{
     {
       id: 'TL',
       position: new Vector2(-100, -100),
+      uv: new Vector2(0, 1),
     },
     {
       id: 'TR',
       position: new Vector2(-100, 100),
+      uv: new Vector2(0, 0),
     },
     {
       id: 'BL',
       position: new Vector2(100, -100),
+      uv: new Vector2(1, 1),
     },
     {
       id: 'BR',
       position: new Vector2(100, 100),
+      uv: new Vector2(1, 0),
     },
   ],
   width: 0,
   height: 0,
 })
 
-const updatePin = (updated: Pin) => {
+const updatePin = (updated: { id: Pin['id']; position: Pin['position'] }) => {
   for (const pin of state.pins) {
     if (pin.id === updated.id) {
       pin.position.copy(updated.position)
@@ -59,18 +63,40 @@ onUnmounted(() => {
 })
 
 // Setup Mode
-const handleSetupTrigger = (e: KeyboardEvent) => {
-  if (e.key === 's') {
-    store.commit('setSetupMode', !store.state.setupMode)
+const handleModeTrigger = (e: KeyboardEvent) => {
+  switch (e.key) {
+    case 'e': {
+      store.commit('setMode', 'exhibition')
+      break
+    }
+    case 'm': {
+      store.commit('setMode', 'map')
+      break
+    }
+    case 's': {
+      store.commit('setMode', 'setup')
+      break
+    }
   }
 }
 
 onMounted(() => {
-  window.addEventListener('keydown', handleSetupTrigger)
+  window.addEventListener('keydown', handleModeTrigger)
 })
 onUnmounted(() => {
-  window.removeEventListener('keydown', handleSetupTrigger)
+  window.removeEventListener('keydown', handleModeTrigger)
 })
+
+// File Selection
+const videoURL = ref<string>()
+const videoRef = ref<HTMLVideoElement>()
+
+const handleFileSelection = (e: Event) => {
+  const file = (e.target as HTMLInputElement).files?.[0]
+  if (file) {
+    videoURL.value = URL.createObjectURL(file)
+  }
+}
 </script>
 
 <template>
@@ -78,15 +104,20 @@ onUnmounted(() => {
     :width="state.width"
     :height="state.height"
     :pins="state.pins"
+    :video="videoRef"
     @pin-position-update="updatePin"
   />
-  <video
-    class="video"
-    v-show="store.state.setupMode"
-    controls
-    autoplay
-    loop
-  ></video>
+  <div class="ui" v-show="store.state.mode === 'setup'">
+    <video
+      class="video"
+      ref="videoRef"
+      controls
+      :src="videoURL"
+      autoplay
+      loop
+    ></video>
+    <input type="file" @change="handleFileSelection" accept="video/*" />
+  </div>
 </template>
 
 <style lang="scss">
@@ -103,5 +134,9 @@ body {
 #app {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+.ui {
+  position: absolute;
 }
 </style>

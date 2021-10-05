@@ -1,16 +1,17 @@
 import { InjectionKey } from 'vue'
 import { createStore, Store } from 'vuex'
+import { Mode } from '../types'
 
 interface State {
-  setupMode: boolean
+  mode: Mode
 }
 
 export const key: InjectionKey<Store<State>> = Symbol()
 export const store = createStore<State>({
-  state: { setupMode: true },
+  state: { mode: 'exhibition' },
   mutations: {
-    setSetupMode(state, setupMode: boolean) {
-      state.setupMode = setupMode
+    setMode(state, mode: Mode) {
+      state.mode = mode
     },
   },
 })
