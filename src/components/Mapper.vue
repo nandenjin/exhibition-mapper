@@ -16,10 +16,7 @@ import { key } from '../store'
 import { Pin } from '../types'
 
 const emit = defineEmits<{
-  (
-    event: 'pinPositionUpdate',
-    pin: { id: Pin['id']; position: Pin['position'] }
-  ): void
+  (event: 'pinPositionUpdate', id: Pin['id'], x: number, y: number): void
 }>()
 
 const store = useStore(key)
@@ -135,7 +132,7 @@ const onMouseMove = (e: MouseEvent): void => {
     clientY - top - props.height / 2
   )
 
-  emit('pinPositionUpdate', { id: focusingPinId, position })
+  emit('pinPositionUpdate', focusingPinId, ...position.toArray())
 }
 
 const onMouseUp = (): void => {

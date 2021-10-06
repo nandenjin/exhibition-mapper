@@ -1,12 +1,16 @@
 <script setup lang="ts">
 import { Vector2 } from 'three'
-import { onMounted, onUnmounted, reactive, ref } from 'vue'
+import { onMounted, onUnmounted, reactive, ref, watch } from 'vue'
 import { useStore } from 'vuex'
 import Mapper from './components/Mapper.vue'
 import { key } from './store'
 import { Pin } from './types'
 
 const store = useStore(key)
+
+enum LocalStorageKey {
+  PIN_POSITIONS = 'exhibition-mapper_pinPositions',
+}
 
 const state = reactive<{
   pins: Pin[]
@@ -39,13 +43,33 @@ const state = reactive<{
   height: 0,
 })
 
-const updatePin = (updated: { id: Pin['id']; position: Pin['position'] }) => {
+const updatePinPosition = (id: Pin['id'], x: number, y: number) => {
   for (const pin of state.pins) {
-    if (pin.id === updated.id) {
-      pin.position.copy(updated.position)
+    if (pin.id === id) {
+      pin.position.set(x, y)
     }
   }
 }
+
+// Restore pins
+onMounted(() => {
+  const posString = localStorage.getItem(LocalStorageKey.PIN_POSITIONS)
+
+  if (posString) {
+    const positions = JSON.parse(posString) as number[][]
+    for (let i = 0; i < Math.min(state.pins.length, positions.length); i++) {
+      updatePinPosition(state.pins[i].id, positions[i][0], positions[i][1])
+    }
+  }
+})
+
+watch([state.pins], () => {
+  const poss = state.pins.reduce<number[][]>((pos, pin) => {
+    pos.push(pin.position.toArray())
+    return pos
+  }, [])
+  localStorage.setItem(LocalStorageKey.PIN_POSITIONS, JSON.stringify(poss))
+})
 
 // Resize
 const updateSize = () => {
@@ -105,7 +129,7 @@ const handleFileSelection = (e: Event) => {
     :height="state.height"
     :pins="state.pins"
     :video="videoRef"
-    @pin-position-update="updatePin"
+    @pin-position-update="updatePinPosition"
   />
   <div class="app-ui" v-show="store.state.mode === 'setup'">
     <video
