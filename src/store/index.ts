@@ -8,7 +8,7 @@ interface State {
 
 export const key: InjectionKey<Store<State>> = Symbol()
 export const store = createStore<State>({
-  state: { mode: 'exhibition' },
+  state: { mode: 'setup' },
   mutations: {
     setMode(state, mode: Mode) {
       state.mode = mode
