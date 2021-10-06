@@ -107,9 +107,9 @@ const handleFileSelection = (e: Event) => {
     :video="videoRef"
     @pin-position-update="updatePin"
   />
-  <div class="ui" v-show="store.state.mode === 'setup'">
+  <div class="app-ui" v-show="store.state.mode === 'setup'">
     <video
-      class="video"
+      class="app-video"
       ref="videoRef"
       controls
       :src="videoURL"
@@ -136,7 +136,12 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-.ui {
+.app-video {
+  max-width: 50vw;
+  max-height: 50vh;
+}
+
+.app-ui {
   position: absolute;
 }
 </style>
