@@ -146,6 +146,9 @@ const handleFileSelection = (e: Event) => {
       autoplay
       loop
     ></video>
+    <div class="key-shortcut-hint">
+      Press keys to switch modes: [e]xhibition / [s]etup / [m]apping
+    </div>
   </div>
 </template>
 
@@ -175,6 +178,11 @@ body {
 
   .file-selector {
     display: block;
+  }
+
+  .key-shortcut-hint {
+    position: fixed;
+    bottom: 10px;
   }
 }
 </style>
