@@ -131,7 +131,7 @@ const handleFileSelection = (e: Event) => {
     :video="videoRef"
     @pin-position-update="updatePinPosition"
   />
-  <div class="app-ui" v-show="store.state.mode === 'setup'">
+  <div class="setup-ui" v-show="store.state.mode === 'setup'">
     <input
       class="file-selector"
       type="file"
@@ -170,7 +170,7 @@ body {
   max-height: 50vh;
 }
 
-.app-ui {
+.setup-ui {
   position: absolute;
 
   .file-selector {
