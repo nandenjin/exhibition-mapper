@@ -132,6 +132,12 @@ const handleFileSelection = (e: Event) => {
     @pin-position-update="updatePinPosition"
   />
   <div class="app-ui" v-show="store.state.mode === 'setup'">
+    <input
+      class="file-selector"
+      type="file"
+      @change="handleFileSelection"
+      accept="video/*"
+    />
     <video
       class="app-video"
       ref="videoRef"
@@ -140,7 +146,6 @@ const handleFileSelection = (e: Event) => {
       autoplay
       loop
     ></video>
-    <input type="file" @change="handleFileSelection" accept="video/*" />
   </div>
 </template>
 
@@ -167,5 +172,9 @@ body {
 
 .app-ui {
   position: absolute;
+
+  .file-selector {
+    display: block;
+  }
 }
 </style>
