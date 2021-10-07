@@ -5,13 +5,13 @@ import {
   OrthographicCamera,
   Vector2,
   Mesh,
-  MeshBasicMaterial,
   BufferGeometry,
   BufferAttribute,
   VideoTexture,
 } from 'three'
 import { onMounted, ref, watch } from 'vue'
 import { useStore } from 'vuex'
+import { VideoMapMaterial } from '../lib/VideoMapMaterial'
 import { key } from '../store'
 import { Pin } from '../types'
 
@@ -74,9 +74,8 @@ const uv = new BufferAttribute(
 geometry.setAttribute('position', position)
 geometry.setAttribute('uv', uv)
 
-const mapMaterial = new MeshBasicMaterial({ color: 0x00bbff })
-const videoMaterial = new MeshBasicMaterial({ color: 0xffffff })
-const mesh = new Mesh(geometry, videoMaterial)
+const mapMaterial = new VideoMapMaterial({ blend: true, videoOpacity: 0.5 })
+const mesh = new Mesh(geometry, mapMaterial)
 mesh.scale.setY(-1)
 
 scene.add(mesh)
@@ -96,12 +95,6 @@ watch([() => props.video], () => {
   if (props.video) {
     const videoTexture = new VideoTexture(props.video)
     videoTexture.needsUpdate = true
-
-    // VideoMaterial
-    videoMaterial.map = videoTexture
-    videoMaterial.needsUpdate = true
-
-    // mapMaterial
     mapMaterial.map = videoTexture
     mapMaterial.needsUpdate = true
   }
@@ -109,9 +102,9 @@ watch([() => props.video], () => {
 
 watch([() => store.state.mode], () => {
   if (store.state.mode === 'map') {
-    mesh.material = mapMaterial
+    mapMaterial.blend = true
   } else {
-    mesh.material = videoMaterial
+    mapMaterial.blend = false
   }
 })
 
