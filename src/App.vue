@@ -172,6 +172,7 @@ body {
 .app-video {
   max-width: 50vw;
   max-height: 50vh;
+  border: 1px solid #888;
 }
 
 .setup-ui {
