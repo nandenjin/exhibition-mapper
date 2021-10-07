@@ -203,6 +203,8 @@ watch([() => props.width, () => props.height], () => {
   }
 
   &__pin {
+    $size: 30px;
+
     position: absolute;
     cursor: pointer;
     user-select: none;
@@ -210,15 +212,19 @@ watch([() => props.width, () => props.height], () => {
     &::before {
       content: '';
       display: inline-block;
-      width: 15px;
-      height: 15px;
+      width: $size;
+      height: $size;
       border: 1px solid #fff;
       transform: translate3d(-50%, -50%, 0);
       background-color: rgba(255, 0, 255, 0.5);
+      vertical-align: middle;
     }
 
     &__label {
-      transform: translate3d(10px, 10px, 0);
+      display: inline-block;
+      transform: translate3d(10px, 0, 0);
+      line-height: $size;
+      font-weight: bold;
     }
   }
 }
