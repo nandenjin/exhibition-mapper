@@ -115,6 +115,13 @@ const handleKeyEvent = async (e: KeyboardEvent) => {
 
       break
     }
+    case 'r': {
+      if (confirm('Reset configs?')) {
+        localStorage.removeItem(LocalStorageKey.PIN_POSITIONS)
+        location.reload()
+      }
+      break
+    }
   }
 }
 
@@ -162,7 +169,7 @@ const handleFileSelection = (e: Event) => {
     ></video>
     <div class="key-shortcut-hint">
       Press keys to switch modes: [e]xhibition / [s]etup / [m]apping /
-      [f]ullscreen
+      [f]ullscreen / [R]eset
     </div>
   </div>
 </template>
