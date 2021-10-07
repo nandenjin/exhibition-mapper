@@ -169,7 +169,7 @@ const handleFileSelection = (e: Event) => {
     ></video>
     <div class="key-shortcut-hint">
       Press keys to switch modes: [e]xhibition / [s]etup / [m]apping /
-      [f]ullscreen / [R]eset
+      [f]ullscreen / [r]eset
     </div>
   </div>
 </template>
