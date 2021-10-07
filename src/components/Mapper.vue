@@ -101,10 +101,10 @@ watch([() => props.video], () => {
 })
 
 watch([() => store.state.mode], () => {
-  if (store.state.mode === 'map') {
-    mapMaterial.blend = true
-  } else {
+  if (store.state.mode === 'exhibition') {
     mapMaterial.blend = false
+  } else {
+    mapMaterial.blend = true
   }
 })
 
