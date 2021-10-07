@@ -88,7 +88,7 @@ onUnmounted(() => {
 })
 
 // Setup Mode
-const handleModeTrigger = (e: KeyboardEvent) => {
+const handleKeyEvent = async (e: KeyboardEvent) => {
   switch (e.key) {
     case 'e': {
       store.commit('setMode', 'exhibition')
@@ -102,14 +102,27 @@ const handleModeTrigger = (e: KeyboardEvent) => {
       store.commit('setMode', 'setup')
       break
     }
+    case 'f': {
+      try {
+        if (document.fullscreenElement) {
+          await document.exitFullscreen()
+        } else {
+          await document.body.requestFullscreen()
+        }
+      } catch (e) {
+        alert('Cannot modify fullscreen mode. Press [F11] to try manually.')
+      }
+
+      break
+    }
   }
 }
 
 onMounted(() => {
-  window.addEventListener('keydown', handleModeTrigger)
+  window.addEventListener('keydown', handleKeyEvent)
 })
 onUnmounted(() => {
-  window.removeEventListener('keydown', handleModeTrigger)
+  window.removeEventListener('keydown', handleKeyEvent)
 })
 
 // File Selection
@@ -148,7 +161,8 @@ const handleFileSelection = (e: Event) => {
       loop
     ></video>
     <div class="key-shortcut-hint">
-      Press keys to switch modes: [e]xhibition / [s]etup / [m]apping
+      Press keys to switch modes: [e]xhibition / [s]etup / [m]apping /
+      [f]ullscreen
     </div>
   </div>
 </template>
@@ -159,7 +173,7 @@ body {
   width: 100%;
   height: 100%;
   margin: 0;
-  font: normal 12px 'Courier New', monospace;
+  font: normal 15px 'Courier New', monospace;
   color: #fff;
   background-color: #000;
 }
@@ -185,6 +199,8 @@ body {
   .key-shortcut-hint {
     position: fixed;
     bottom: 10px;
+    width: 100%;
+    font-weight: bold;
   }
 }
 </style>
