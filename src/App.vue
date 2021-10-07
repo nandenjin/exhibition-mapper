@@ -5,6 +5,7 @@ import { useStore } from 'vuex'
 import Mapper from './components/Mapper.vue'
 import { key } from './store'
 import { Pin } from './types'
+import sampleVideoPath from './assets/sample.webm'
 
 const store = useStore(key)
 
@@ -112,7 +113,7 @@ onUnmounted(() => {
 })
 
 // File Selection
-const videoURL = ref<string>()
+const videoURL = ref<string>(sampleVideoPath)
 const videoRef = ref<HTMLVideoElement>()
 
 const handleFileSelection = (e: Event) => {
