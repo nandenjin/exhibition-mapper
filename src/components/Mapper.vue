@@ -91,14 +91,16 @@ const updateVertices = () => {
 updateVertices()
 watch([props.pins], updateVertices)
 
-watch([() => props.video], () => {
+const updateVideo = () => {
   if (props.video) {
     const videoTexture = new VideoTexture(props.video)
     videoTexture.needsUpdate = true
     mapMaterial.map = videoTexture
     mapMaterial.needsUpdate = true
   }
-})
+}
+updateVideo()
+watch([() => props.video], updateVideo)
 
 watch([() => store.state.mode], () => {
   if (store.state.mode === 'exhibition') {
