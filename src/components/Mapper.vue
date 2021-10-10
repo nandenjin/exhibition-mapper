@@ -92,11 +92,29 @@ updateVertices()
 watch([props.pins], updateVertices)
 
 const updateVideo = () => {
-  if (props.video) {
-    const videoTexture = new VideoTexture(props.video)
-    videoTexture.needsUpdate = true
-    mapMaterial.map = videoTexture
-    mapMaterial.needsUpdate = true
+  const video = props.video
+  if (video) {
+    const loadVideoToTexture = () => {
+      const videoTexture = new VideoTexture(video)
+      videoTexture.needsUpdate = true
+      mapMaterial.map = videoTexture
+      mapMaterial.needsUpdate = true
+    }
+
+    if (video.readyState !== video.HAVE_ENOUGH_DATA) {
+      console.info('Waiting video load')
+      video.addEventListener('load', () => {
+        console.info('Video loaded')
+        loadVideoToTexture()
+      })
+      video.addEventListener('play', () => {
+        console.info('Video played')
+        loadVideoToTexture()
+      })
+    } else {
+      console.info('Video is ready')
+      loadVideoToTexture()
+    }
   }
 }
 updateVideo()
