@@ -16,7 +16,7 @@
     "eslint-config-prettier": "^8.3.0",
     "prettier": "^2.4.1",
     "sass": "^1.42.1",
-    "three": "^0.132.2",
+    "three": "^0.137.0",
     "vue": "^3.2.16",
     "vuex": "^4.0.2"
   },
